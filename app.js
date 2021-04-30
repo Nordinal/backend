@@ -3,7 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-mongoose.connect("mongodb://localhost:27017/zidprof")
+mongoose.connect("mongodb://localhost:27017/zidprof", { useNewUrlParser: true, useUnifiedTopology: true })
 
 const userShema = new Schema({
     email: String,
@@ -25,20 +25,25 @@ let allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain);
 
-app.post("/api/user", jsonParser, function(req,res) {
-    let emailReq = req.body.email;
-    let passwordReq = req.body.password;
-    if(emailReq == "" || passwordReq == "") return res.send(false)
-    User.findOne({email: emailReq}, function(err,data) {
-        if(err) return console.log(err)
-        if(data.email == "") return res.send(false);
-        if(data.password == passwordReq){
-            res.send(true)
+app.post("/api/user", jsonParser, async function(req,res) {
+    try{
+        let {email, password} = req.body;
+        const user = await User.findOne({email})
+        if(!user) return res.send(false);
+        if(user.password == password){
+            res.json({
+                email: user.email,
+                password: user.password,
+                tel: user.tel
+            });
         }
         else{
             res.send(false);
         }
-    })
+    }
+    catch(e){
+        console.log(e);
+    }
 });
 
 app.listen(5000);
