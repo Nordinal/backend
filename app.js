@@ -27,7 +27,9 @@ const messageSchema = new Schema({
     name: String,
     tel: String,
     message: String,
+    status: Boolean,
 })
+
 const jsonParser = express.json();
 
 const User = mongoose.model("users", userShema);
@@ -47,12 +49,40 @@ app.use(allowCrossDomain);
 app.post("/api/message", jsonParser, async function(req,res) {
     try{
         const {name, tel, message} = req.body
-        const newMessage = await Message.insertMany({name, tel, message})
+        const newMessage = await Message.insertMany({name, tel, message, status: false})
         res.json(true);
     }
     catch(e){
         console.log(e)
         res.json(false);
+    }
+})
+app.get("/api/request", jsonParser, async function(req,res){
+    try{
+        const message = await Message.find();
+        res.json(message);
+    }
+    catch(e){
+        console.log(e);
+        res.json(false);
+    }
+})
+app.post("/api/updatestatusrequest", jsonParser, async function(req,res){
+    try{
+        await Message.updateOne({_id: req.body.id}, {$set: {status: true}})
+        res.json(true);
+    }
+    catch(e){
+        console.log(e);
+        res.json(false);
+    }
+})
+app.delete("/api/deleterequest", jsonParser, async function(req, res){
+    try{
+        await Message.deleteOne({_id: req.body.id});
+    }
+    catch(e){
+        console.log(e);
     }
 })
 
