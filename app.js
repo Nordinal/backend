@@ -13,7 +13,8 @@ const userShema = new Schema({
     isAdmin: Boolean,
 })
 const tagShema = new Schema({
-    tag: Array
+    tag: String,
+    like: Number
 })
 const aboutUsShema = new Schema({
     name: String,
@@ -77,12 +78,15 @@ app.post("/api/updatestatusrequest", jsonParser, async function(req,res){
         res.json(false);
     }
 })
-app.delete("/api/deleterequest", jsonParser, async function(req, res){
+app.post("/api/deleterequest", jsonParser, async function(req, res){
     try{
+        console.log(req.body)
         await Message.deleteOne({_id: req.body.id});
+        res.json(true);
     }
     catch(e){
         console.log(e);
+        res.json(false);
     }
 })
 
@@ -109,8 +113,30 @@ app.post("/api/user", jsonParser, async function(req,res) {
 
 app.get("/api/tag", jsonParser, async function(req, res) {
     try{
-        const tags = await Tags.find()
-        res.json(tags[0]);
+        const tags = await Tags.find();
+        res.json(tags);
+    }
+    catch(e){
+        console.log(e);
+    }
+})
+app.post("/api/liketag", jsonParser, async function(req, res){
+    try{
+        const id = req.body.id;
+        Tags.updateOne({_id: req.body.id}, {$inc: {like: 1}}).then(() => {
+            res.json(true);
+        })
+    }
+    catch(e){
+        console.log(e);
+    }
+})
+app.post("/api/unliketag", jsonParser, async function(req, res){
+    try{
+        const id = req.body.id;
+        Tags.updateOne({_id: req.body.id}, {$inc: {like: -1}}).then(() => {
+            res.json(true);
+        })
     }
     catch(e){
         console.log(e);
