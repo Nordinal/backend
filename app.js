@@ -13,7 +13,6 @@ const userShema = new Schema({
     tel: String,
     password: String,
     isAdmin: Boolean,
-    tests: Array,
 }) 
 const tagShema = new Schema({
     tag: String,
@@ -137,7 +136,6 @@ app.post("/api/usercookie", jsonParser, async function(req,res) {
 app.post("/api/changeuser", jsonParser, async function(req, res){
     try{
         const {tel, passOld, passNew, passNewRepeat, id} = req.body
-        console.log(req.body);
         if(req.body.passOld != ''){
             if(passNew == passNewRepeat && passNew != "" && passNew.length > 8){
                 const user = await User.findOne({_id: id});
@@ -145,8 +143,7 @@ app.post("/api/changeuser", jsonParser, async function(req, res){
                 const cryptPass = await bcrypt.compare(passOld, user.password);
                 if(cryptPass){
                     const cryptPassNew = await bcrypt.hash(passNew, 4);
-                    User.updateOne({_id: id}, {$set: {password: cryptPassNew}}).then((result) =>{
-                        console.log(result)
+                    User.updateOne({_id: id}, {$set: {password: cryptPassNew, tel: tel}}).then((result) =>{
                         res.json({
                             tel: user.tel,
                             isFine: true,
@@ -162,7 +159,6 @@ app.post("/api/changeuser", jsonParser, async function(req, res){
             }
         }
         else{
-            console.log(id);
             const user = await User.findOne({_id: id});
             if(!user) return res.json({isFine: false});
             User.updateOne({_id: id}, {$set: {tel: tel}}).then((result) =>{
@@ -211,7 +207,7 @@ app.post("/api/reg", jsonParser, async function(req,res) {
             }
             else{
                 const cryptPass = await bcrypt.hash(pass, 4);
-                const result = await User.insertMany({email, tel, password: cryptPass, isAdmin: false, tests: [0, 0]});
+                const result = await User.insertMany({email, tel, password: cryptPass, isAdmin: false});
                 const user = await User.findOne({email});
                 if(result){
                     res.json({
