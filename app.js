@@ -8,7 +8,7 @@ const validator = require('validator')
 require('dotenv').config() //heroku
 const cors = require('cors');
 
-const PORT = process.env.port || 80
+const PORT = Process.env.port || 80
 app.use(cors())
 mongoose.connect("mongodb+srv://zidprof:gbhfvblf30061998@cluster0.buew0.mongodb.net/zidprof?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true })
 
