@@ -5,7 +5,11 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
 const validator = require('validator')
+require('dotenv').config() //heroku
+const cors = require('cors');
 
+const PORT = process.env.port || 80
+app.use(cors())
 mongoose.connect("mongodb+srv://zidprof:gbhfvblf30061998@cluster0.buew0.mongodb.net/zidprof?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology: true })
 
 const userShema = new Schema({
@@ -41,7 +45,7 @@ const AboutUs = mongoose.model("about", aboutUsShema);
 const Message = mongoose.model("messages", messageSchema);
 
 let allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', "http://localhost:3000");
+    res.header('Access-Control-Allow-Origin', "*");
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
@@ -281,4 +285,4 @@ app.get("/api/public/:id", async function(req, res){
     }
     res.end();
 })
-app.listen(5000);
+app.listen(PORT);
